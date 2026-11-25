@@ -1,7 +1,6 @@
-[25.11.2026 18:36] Hasanboy Razzaqov: import asyncio
+import asyncio
 import logging
 import os
-from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command, CommandStart
@@ -16,13 +15,11 @@ from aiogram.types import (
     ReplyKeyboardRemove,
 )
 
-load_dotenv()
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID_RAW = os.getenv("ADMIN_ID")
 
 if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN topilmadi! Muhit o'zgaruvchilarini tekshiring.")
+    raise ValueError("BOT_TOKEN topilmadi! GitHub Secrets'ni tekshiring.")
 
 ADMIN_ID = int(ADMIN_ID_RAW) if ADMIN_ID_RAW and ADMIN_ID_RAW.isdigit() else None
 
@@ -41,7 +38,6 @@ class VolunteerForm(StatesGroup):
     confirm = State()
 
 
-# --- MENYULAR ---
 main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="📝 Volontyor bo‘lish")],
@@ -91,7 +87,6 @@ async def set_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
 
-# --- ASOSIY BUYRUQLAR ---
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
@@ -136,8 +131,7 @@ async def contact_info(message: types.Message):
         "Koordinator: @username\n"
         "Telefon: +998 90 123 45 67"
     )
-[25.11.2026 18:36] Hasanboy Razzaqov: # --- RO'YXATDAN O'TISH BOSQICHLARI (5 TA SAVOL) ---
-@dp.message(F.text == "📝 Volontyor bo‘lish")
+[25.11.2026 20:44] Hasanboy Razzaqov: @dp.message(F.text == "📝 Volontyor bo‘lish")
 @dp.message(Command("register"))
 async def start_form(message: types.Message, state: FSMContext):
     await state.set_state(VolunteerForm.full_name)
@@ -231,7 +225,6 @@ async def get_direction(message: types.Message, state: FSMContext):
     await message.answer(preview_text, parse_mode="HTML", reply_markup=confirm_inline)
 
 
-# --- TASDIQLASH VA ADMIN'GA YUBORISH ---
 @dp.callback_query(VolunteerForm.confirm, F.data == "confirm_yes")
 async def confirm_yes(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
@@ -240,7 +233,7 @@ async def confirm_yes(callback: types.CallbackQuery, state: FSMContext):
 
     admin_message = (
         "🆕 <b>YANGI VOLONTYOR ARIZASI</b>\n\n"
-[25.11.2026 18:36] Hasanboy Razzaqov: f"👤 <b>F.I.Sh.:</b> {data['full_name']}\n"
+        f"👤 <b>F.I.Sh.:</b> {data['full_name']}\n"
         f"🎂 <b>Yosh:</b> {data['age']}\n"
         f"📞 <b>Telefon:</b> {data['phone']}\n"
         f"📍 <b>Hudud:</b> {data['region']}\n"
@@ -248,8 +241,7 @@ async def confirm_yes(callback: types.CallbackQuery, state: FSMContext):
         f"🔹 <b>Telegram:</b> {username_text}\n"
         f"🆔 <b>ID:</b> <code>{user.id}</code>"
     )
-
-    if ADMIN_ID:
+[25.11.2026 20:44] Hasanboy Razzaqov: if ADMIN_ID:
         await bot.send_message(chat_id=ADMIN_ID, text=admin_message, parse_mode="HTML")
 
     await callback.message.edit_text(
